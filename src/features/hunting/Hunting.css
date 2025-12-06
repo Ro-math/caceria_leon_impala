@@ -1,0 +1,105 @@
+/* Hunting Feature */
+.hunting-panel {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: var(--spacing-lg);
+    height: calc(100vh - 140px);
+    /* Adjust based on header/footer */
+}
+
+.hunting-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: center;
+}
+
+.hunting-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    overflow-y: auto;
+    padding-right: var(--spacing-sm);
+}
+
+.action-display {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--spacing-md);
+    background-color: var(--bg-card);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.action-item {
+    text-align: center;
+}
+
+.action-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.action-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+.explanation-box {
+    background-color: rgba(255, 183, 3, 0.1);
+    border: 1px solid var(--color-primary);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-style: italic;
+    color: var(--text-main);
+}
+
+.timeline-item {
+    padding: var(--spacing-sm);
+    border-left: 2px solid var(--grid-line);
+    margin-left: var(--spacing-sm);
+    position: relative;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+}
+
+.timeline-item.active::before {
+    background-color: var(--color-primary);
+}
+
+.result-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    z-index: 20;
+    border: 2px solid var(--color-primary);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}

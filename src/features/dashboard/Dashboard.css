@@ -1,0 +1,62 @@
+/* Dashboard Feature */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.welcome-section {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+    color: var(--text-dark);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.welcome-title {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.welcome-text {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.quick-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+}
+
+.activity-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bg-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+}

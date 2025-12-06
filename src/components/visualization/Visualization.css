@@ -1,0 +1,59 @@
+/* Visualization */
+.game-map-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-md);
+    background-color: var(--bg-panel);
+    border-radius: var(--radius-lg);
+    overflow: auto;
+}
+
+.game-map {
+    display: grid;
+    grid-template-columns: repeat(19, 1fr);
+    gap: 1px;
+    background-color: var(--grid-bg);
+    border: 2px solid var(--color-primary);
+    position: relative;
+    width: fit-content;
+}
+
+.grid-cell {
+    width: 30px;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.02);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    position: relative;
+}
+
+.grid-cell.water {
+    background-color: var(--color-secondary);
+    opacity: 0.5;
+}
+
+.grid-cell.position-marker {
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+}
+
+.grid-cell.position-marker::after {
+    content: attr(data-label);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.vision-polygon {
+    fill-opacity: 0.2;
+    stroke-width: 0;
+    transition: fill-opacity 0.3s ease;
+}
+
+.vision-polygon.active {
+    fill-opacity: 0.4;
+}
