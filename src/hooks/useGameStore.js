@@ -34,7 +34,9 @@ export const useGameStore = create((set, get) => ({
     startHunting: async (config) => {
         set({ isLoading: true });
         try {
-            const state = await huntingService.start(config);
+            await huntingService.start(config);
+            // Fetch the initial state explicitly because start() only returns a message
+            const state = await huntingService.getState();
             set({ huntState: state, huntHistory: [state], isLoading: false });
         } catch (error) {
             set({ error: error.message, isLoading: false });
@@ -42,13 +44,12 @@ export const useGameStore = create((set, get) => ({
     },
 
     stepHunting: async () => {
-        // Optimistic update or wait for response? Wait for response to be safe.
         try {
             const result = await huntingService.step();
-            // result contains action_impala, action_lion, new_state, reason
+            // result contains the new state fields directly (lion, impala, etc.)
             set((state) => ({
-                huntState: result.new_state,
-                huntHistory: [...state.huntHistory, result.new_state],
+                huntState: result,
+                huntHistory: [...state.huntHistory, result],
             }));
             return result;
         } catch (error) {

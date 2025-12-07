@@ -54,9 +54,13 @@ const HuntingPanel = () => {
                         />
                         <div style={{ position: 'relative' }}>
                             <GameMap
-                                lionPosition={huntState.lion_position}
+                                lionPosition={huntState.lion?.position}
                                 impalaAction={huntState.impala_action}
-                                activeVision={null} // Could derive from impala_action if it's "look left" etc.
+                                activeVision={
+                                    huntState.impala_action === 'look_front' ? 'front' :
+                                        huntState.impala_action === 'look_left' ? 'left' :
+                                            huntState.impala_action === 'look_right' ? 'right' : null
+                                }
                             />
                             {huntState.result && (
                                 <div className="result-overlay">

@@ -34,7 +34,25 @@ const TrainingConfig = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        startTraining(config);
+
+        // Prepare payload
+        const payload = {
+            ...config,
+            impala_sequence: config.impala_mode === 'programmed' && config.impala_sequence
+                ? config.impala_sequence.split(',').map(s => {
+                    const map = {
+                        'L': 'look_left',
+                        'R': 'look_right',
+                        'F': 'look_front',
+                        'W': 'drink',
+                        'H': 'flee'
+                    };
+                    return map[s.trim().toUpperCase()] || s.trim();
+                }).filter(Boolean)
+                : null
+        };
+
+        startTraining(payload);
     };
 
     return (

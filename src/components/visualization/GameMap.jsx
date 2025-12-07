@@ -8,24 +8,31 @@ const GameMap = ({ lionPosition, impalaAction, activeVision }) => {
     // Map Size
     const rows = 19;
     const cols = 19;
-    const cellSize = 31; // 30px + 1px gap
+    const cellSize = 36; // 35px + 1px gap
 
     // Waterhole: (6,7) to (8,11)
+    // User definition: (Row, Col)
+    // Rows: 6 to 8
+    // Cols: 7 to 11
     const isWater = (x, y) => {
-        return x >= 6 && x <= 8 && y >= 7 && y <= 11;
+        // x is Column, y is Row in our grid rendering loop
+        return y >= 6 && y <= 8 && x >= 7 && x <= 11;
     };
 
-    // Positions
+    // Positions (User definition: Row, Col)
+    // We map to { x: Col, y: Row } for rendering
     const positions = {
-        1: { x: 0, y: 9 },
-        2: { x: 0, y: 18 },
-        3: { x: 9, y: 18 },
-        4: { x: 18, y: 18 },
-        5: { x: 18, y: 9 },
-        6: { x: 18, y: 0 },
-        7: { x: 9, y: 0 },
-        8: { x: 0, y: 0 },
+        1: { x: 9, y: 0 },   // (0,9) -> Row 0, Col 9
+        2: { x: 18, y: 0 },  // (0,18) -> Row 0, Col 18
+        3: { x: 18, y: 9 },  // (9,18) -> Row 9, Col 18
+        4: { x: 18, y: 18 }, // (18,18) -> Row 18, Col 18
+        5: { x: 9, y: 18 },  // (18,9) -> Row 18, Col 9
+        6: { x: 0, y: 18 },  // (18,0) -> Row 18, Col 0
+        7: { x: 0, y: 9 },   // (9,0) -> Row 9, Col 0
+        8: { x: 0, y: 0 },   // (0,0) -> Row 0, Col 0
     };
+
+    console.log('[GameMap] Rendering map. LionPos:', lionPosition, 'ImpalaAction:', impalaAction, 'ActiveVision:', activeVision);
 
     const getPositionLabel = (x, y) => {
         for (const [key, pos] of Object.entries(positions)) {
@@ -34,7 +41,7 @@ const GameMap = ({ lionPosition, impalaAction, activeVision }) => {
         return null;
     };
 
-    // Impala Position
+    // Impala Position (9,9) -> Row 9, Col 9
     const impalaPos = { x: 9, y: 9 };
 
     // Render Grid Background
@@ -57,12 +64,36 @@ const GameMap = ({ lionPosition, impalaAction, activeVision }) => {
     // Calculate absolute positions
     const getStyle = (pos) => {
         if (!pos) return { display: 'none' };
-        // Handle both object {x,y} and array [x,y] if API is inconsistent
-        const x = Array.isArray(pos) ? pos[0] : pos.x;
-        const y = Array.isArray(pos) ? pos[1] : pos.y;
 
+        // Check if pos is array [Row, Col] from backend or object {x, y}
+        let r, c;
+        if (Array.isArray(pos)) {
+            r = pos[0];
+            c = pos[1];
+        } else {
+            // If it's an object, assume it matches our internal structure {x: Col, y: Row} 
+            // OR check if it has row/col props. 
+            // For safety, let's assume the passed prop `lionPosition` might be [Row, Col] from API.
+            // But if it comes from `positions` object above, it is {x, y}.
+            if ('x' in pos) {
+                c = pos.x;
+                r = pos.y;
+            } else {
+                // Fallback or error
+                console.error('[GameMap] Unknown pos format:', pos);
+                return { display: 'none' };
+            }
+        }
+
+        // Ensure valid coordinates
+        if (r === undefined || c === undefined) {
+            console.error('[GameMap] Invalid position:', pos);
+            return { display: 'none' };
+        }
+
+        // Translate uses x (Col), y (Row)
         return {
-            transform: `translate(${x * cellSize}px, ${y * cellSize}px)`
+            transform: `translate(${c * cellSize}px, ${r * cellSize}px)`
         };
     };
 
