@@ -109,7 +109,7 @@ const HuntingPanel = () => {
                     <>
                         <ExplanationPanel timeStep={huntState.time_step} />
                         <TimelineView history={huntHistory} />
-                        <HuntingStats history={huntHistory} />
+                        <HuntingStats huntState={huntState} />
                     </>
                 )}
             </div>
