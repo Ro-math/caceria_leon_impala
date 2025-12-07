@@ -38,8 +38,74 @@
 }
 
 .grid-cell.water {
-    background-color: var(--color-secondary);
-    opacity: 0.5;
+    background: linear-gradient(135deg,
+            #1e3a8a 0%,
+            #2563eb 25%,
+            #3b82f6 50%,
+            #60a5fa 75%,
+            #93c5fd 100%);
+    background-size: 200% 200%;
+    animation: waterShimmer 8s ease-in-out infinite, waterWave 3s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Water shimmer animation - slow gradient movement */
+@keyframes waterShimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Water wave animation - subtle scale pulse */
+@keyframes waterWave {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: scale(1.02);
+        opacity: 0.85;
+    }
+}
+
+/* Water ripple effect overlay */
+.grid-cell.water::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+    animation: ripple 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.6;
+        transform: scale(1.05);
+    }
 }
 
 .grid-cell.position-marker {
