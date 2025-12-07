@@ -42,23 +42,25 @@ const TrainingProgress = () => {
             <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 {getStatusBadge()}
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    {isTraining && !isCompleted && (
+                    {isTraining && (
                         <Button
                             onClick={pauseTraining}
                             variant="secondary"
                             className="btn-sm"
-                            title="Pausar entrenamiento (La ejecución es muy rápida, puede ser difícil pausar)"
+                            disabled={isCompleted}
+                            title={isCompleted ? "El entrenamiento ya finalizó (el proceso es muy rápido)" : "Pausar entrenamiento (La ejecución es muy rápida, puede ser difícil pausar)"}
                         >
                             <FaPause /> Pausar
                         </Button>
                     )}
-                    {isPaused && !isCompleted && (
+                    {isPaused && (
                         <>
                             <Button
                                 onClick={resumeTraining}
                                 variant="primary"
                                 className="btn-sm"
-                                title="Reanudar entrenamiento desde donde se pausó"
+                                disabled={isCompleted}
+                                title={isCompleted ? "El entrenamiento ya finalizó (el proceso es muy rápido)" : "Reanudar entrenamiento desde donde se pausó"}
                             >
                                 <FaPlay /> Reanudar
                             </Button>
@@ -66,7 +68,8 @@ const TrainingProgress = () => {
                                 onClick={stopTraining}
                                 variant="danger"
                                 className="btn-sm"
-                                title="Detener completamente el entrenamiento"
+                                disabled={isCompleted}
+                                title={isCompleted ? "El entrenamiento ya finalizó (el proceso es muy rápido)" : "Detener completamente el entrenamiento"}
                             >
                                 <FaStop /> Detener
                             </Button>
@@ -86,6 +89,7 @@ const TrainingProgress = () => {
                 </div>
                 <div className="stat-card">
                     <div className="stat-value">{status?.fail_count || 0}</div>
+                    <div className="stat-label">Fallos</div>
                 </div>
             </div>
 

@@ -21,6 +21,10 @@ export const knowledgeService = {
         const response = await api.delete('/knowledge/clear');
         return response.data;
     },
+    reset: async () => {
+        const response = await api.post('/knowledge/reset');
+        return response.data;
+    },
     getAbstractions: async () => {
         const response = await api.get('/knowledge/abstractions');
         return response.data;

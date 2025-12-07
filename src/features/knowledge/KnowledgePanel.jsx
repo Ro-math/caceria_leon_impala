@@ -5,7 +5,7 @@ import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
 import { knowledgeService } from '../../services/knowledgeService';
-import { FaSave, FaFolderOpen, FaTrash, FaSync, FaInfoCircle, FaDownload } from 'react-icons/fa';
+import { FaSave, FaFolderOpen, FaTrash, FaSync, FaInfoCircle, FaDownload, FaRedo } from 'react-icons/fa';
 import Modal from '../../components/common/Modal';
 import toast from 'react-hot-toast';
 import './Knowledge.css';
@@ -21,6 +21,7 @@ const KnowledgePanel = () => {
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [showLoadModal, setShowLoadModal] = useState(false);
     const [showClearModal, setShowClearModal] = useState(false);
+    const [showResetModal, setShowResetModal] = useState(false);
     const [filename, setFilename] = useState('knowledge_base');
 
     const loadData = async () => {
@@ -125,6 +126,21 @@ const KnowledgePanel = () => {
         }
     };
 
+    const handleReset = async () => {
+        try {
+            await knowledgeService.reset();
+            // Clear all localStorage
+            localStorage.clear();
+            toast.success('Aplicación reiniciada completamente');
+            loadData();
+            setShowResetModal(false);
+            // Reload page to reset all state
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (error) {
+            toast.error('Error al reiniciar');
+        }
+    };
+
     return (
         <div className="knowledge-panel">
             <div className="knowledge-controls">
@@ -133,6 +149,7 @@ const KnowledgePanel = () => {
                 <Button onClick={() => setShowClearModal(true)} variant="danger"><FaTrash /> Limpiar</Button>
                 <Button onClick={loadData} variant="outline" isLoading={loading}><FaSync /> Actualizar</Button>
                 <Button onClick={() => setShowInfo(true)} variant="primary"><FaInfoCircle /> Info</Button>
+                <Button onClick={() => setShowResetModal(true)} variant="danger"><FaRedo /> Reiniciar App</Button>
             </div>
 
             {/* Save Modal */}
@@ -190,6 +207,33 @@ const KnowledgePanel = () => {
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                             <Button onClick={() => setShowClearModal(false)} variant="outline">Cancelar</Button>
                             <Button onClick={handleClear} variant="danger"><FaTrash /> Confirmar Limpieza</Button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Reset Modal */}
+            {showResetModal && (
+                <Modal isOpen={true} title="Reiniciar Aplicación Completa" onClose={() => setShowResetModal(false)}>
+                    <div style={{ padding: '1rem' }}>
+                        <p style={{ marginBottom: '1rem', color: 'var(--danger, #ef4444)', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                            🔴 ¿Estás seguro de reiniciar TODA la aplicación?
+                        </p>
+                        <p style={{ marginBottom: '1rem' }}>
+                            Esta acción realizará:
+                        </p>
+                        <ul style={{ marginBottom: '1rem', paddingLeft: '1.5rem' }}>
+                            <li>Borrar todo el conocimiento (Q-tables y abstracciones)</li>
+                            <li>Limpiar todo el localStorage (estadísticas de cacería, etc.)</li>
+                            <li>Reiniciar el backend al estado inicial</li>
+                            <li>Recargar la página automáticamente</li>
+                        </ul>
+                        <p style={{ marginBottom: '1.5rem', color: 'var(--danger, #ef4444)' }}>
+                            ⚠️ Esta acción NO se puede deshacer. Todos los datos se perderán permanentemente.
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                            <Button onClick={() => setShowResetModal(false)} variant="outline">Cancelar</Button>
+                            <Button onClick={handleReset} variant="danger"><FaRedo /> Confirmar Reinicio</Button>
                         </div>
                     </div>
                 </Modal>
