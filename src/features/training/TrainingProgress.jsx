@@ -21,6 +21,7 @@ const TrainingProgress = () => {
     if (!status && !isTraining && !isPaused) return null;
 
     const progress = status ? (status.current_incursion / status.total_incursions) * 100 : 0;
+    const isCompleted = status?.status === 'completed';
 
     // Determine status badge
     const getStatusBadge = () => {
@@ -28,7 +29,7 @@ const TrainingProgress = () => {
             return <span className="status-badge running">🟢 En Ejecución</span>;
         } else if (isPaused) {
             return <span className="status-badge paused">🟡 Pausado</span>;
-        } else if (status?.status === 'completed') {
+        } else if (isCompleted) {
             return <span className="status-badge completed">✅ Completado</span>;
         } else if (status?.status === 'stopped') {
             return <span className="status-badge stopped">🔴 Detenido</span>;
@@ -41,17 +42,32 @@ const TrainingProgress = () => {
             <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 {getStatusBadge()}
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    {isTraining && (
-                        <Button onClick={pauseTraining} variant="secondary" className="btn-sm">
+                    {isTraining && !isCompleted && (
+                        <Button
+                            onClick={pauseTraining}
+                            variant="secondary"
+                            className="btn-sm"
+                            title="Pausar entrenamiento (La ejecución es muy rápida, puede ser difícil pausar)"
+                        >
                             <FaPause /> Pausar
                         </Button>
                     )}
-                    {isPaused && (
+                    {isPaused && !isCompleted && (
                         <>
-                            <Button onClick={resumeTraining} variant="primary" className="btn-sm">
+                            <Button
+                                onClick={resumeTraining}
+                                variant="primary"
+                                className="btn-sm"
+                                title="Reanudar entrenamiento desde donde se pausó"
+                            >
                                 <FaPlay /> Reanudar
                             </Button>
-                            <Button onClick={stopTraining} variant="danger" className="btn-sm">
+                            <Button
+                                onClick={stopTraining}
+                                variant="danger"
+                                className="btn-sm"
+                                title="Detener completamente el entrenamiento"
+                            >
                                 <FaStop /> Detener
                             </Button>
                         </>
@@ -70,7 +86,6 @@ const TrainingProgress = () => {
                 </div>
                 <div className="stat-card">
                     <div className="stat-value">{status?.fail_count || 0}</div>
-                    <div className="stat-label">Fallos</div>
                 </div>
             </div>
 
