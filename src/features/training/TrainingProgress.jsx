@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import { useTrainingStore } from '../../hooks/useTrainingStore';
@@ -6,7 +6,8 @@ import { FaPause, FaPlay, FaStop } from 'react-icons/fa';
 import './Training.css';
 
 const TrainingProgress = () => {
-    const { status, isTraining, isPaused, fetchStatus, pauseTraining, resumeTraining, stopTraining } = useTrainingStore();
+    const { status, isTraining, isPaused, fetchStatus, pauseTraining, resumeTraining, stopTraining, fetchStatistics } = useTrainingStore();
+    const prevStatusRef = useRef();
 
     useEffect(() => {
         let interval;
@@ -17,6 +18,20 @@ const TrainingProgress = () => {
         }
         return () => clearInterval(interval);
     }, [isTraining, isPaused, fetchStatus]);
+
+    // Fetch statistics when training completes
+    useEffect(() => {
+        const currentStatus = status?.status;
+        const prevStatus = prevStatusRef.current;
+
+        // When status changes to 'stopped' or 'completed', fetch statistics
+        if ((currentStatus === 'stopped' || currentStatus === 'completed') && prevStatus !== currentStatus) {
+            console.log('[TrainingProgress] Training finished with status:', currentStatus, '- Fetching statistics...');
+            fetchStatistics();
+        }
+
+        prevStatusRef.current = currentStatus;
+    }, [status?.status, fetchStatistics]);
 
     if (!status && !isTraining && !isPaused) return null;
 

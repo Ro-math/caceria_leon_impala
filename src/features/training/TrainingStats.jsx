@@ -1,39 +1,19 @@
-import React, { useEffect, useRef } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import React, { useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Card from '../../components/common/Card';
 import { useTrainingStore } from '../../hooks/useTrainingStore';
 
 const TrainingStats = () => {
-    const { statistics, status, fetchStatistics, isTraining } = useTrainingStore();
-    const prevStatusRef = useRef();
+    const { statistics, fetchStatistics } = useTrainingStore();
 
-    useEffect(() => {
-        // Detect when training just completed
-        if (prevStatusRef.current?.status !== 'completed' && status?.status === 'completed') {
-            // Wait 2 seconds for backend to finish calculating statistics
-            setTimeout(() => {
-                fetchStatistics();
-            }, 2000);
-        }
-        prevStatusRef.current = status;
-    }, [status, fetchStatistics]);
-
-    useEffect(() => {
-        // Fetch statistics when training completes or when not training
-        if (!isTraining) {
-            fetchStatistics();
-        }
-    }, [isTraining, fetchStatistics]);
-
-    // Also fetch on mount
+    // Fetch on mount
     useEffect(() => {
         fetchStatistics();
-    }, []);
+    }, [fetchStatistics]);
 
     if (!statistics) return null;
 
     // Transform data for charts
-    // Assuming statistics has { success_rate_by_position: { 1: 0.5, ... }, history: [...] }
     const positionData = Object.entries(statistics.success_rate_by_position || {}).map(([pos, rate]) => ({
         position: `Pos ${pos}`,
         rate: rate * 100
