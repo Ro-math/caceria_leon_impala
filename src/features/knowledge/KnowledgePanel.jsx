@@ -3,6 +3,7 @@ import KnowledgeTable from './KnowledgeTable';
 import AbstractionViewer from './AbstractionViewer';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
+import Input from '../../components/common/Input';
 import { knowledgeService } from '../../services/knowledgeService';
 import { FaSave, FaFolderOpen, FaTrash, FaSync, FaInfoCircle, FaDownload } from 'react-icons/fa';
 import Modal from '../../components/common/Modal';
@@ -15,6 +16,12 @@ const KnowledgePanel = () => {
     const [abstractions, setAbstractions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+
+    // Modal states
+    const [showSaveModal, setShowSaveModal] = useState(false);
+    const [showLoadModal, setShowLoadModal] = useState(false);
+    const [showClearModal, setShowClearModal] = useState(false);
+    const [filename, setFilename] = useState('knowledge_base');
 
     const loadData = async () => {
         setLoading(true);
@@ -47,8 +54,11 @@ const KnowledgePanel = () => {
     }, [activeTab]);
 
     const handleSave = async () => {
-        const filename = prompt('Nombre del archivo:', 'knowledge_base');
-        if (!filename) return;
+        if (!filename.trim()) {
+            toast.error('Por favor ingresa un nombre de archivo');
+            return;
+        }
+
         try {
             // Save to server
             await knowledgeService.save(filename);
@@ -81,6 +91,7 @@ const KnowledgePanel = () => {
             URL.revokeObjectURL(url);
 
             toast.success(`Conocimiento guardado y descargado como ${filename}_export.json`);
+            setShowSaveModal(false);
         } catch (error) {
             console.error('Error al guardar:', error);
             toast.error('Error al guardar');
@@ -88,23 +99,27 @@ const KnowledgePanel = () => {
     };
 
     const handleLoad = async () => {
-        const filename = prompt('Nombre del archivo a cargar:', 'knowledge_base');
-        if (!filename) return;
+        if (!filename.trim()) {
+            toast.error('Por favor ingresa un nombre de archivo');
+            return;
+        }
+
         try {
             await knowledgeService.load(filename);
             toast.success('Conocimiento cargado');
             loadData();
+            setShowLoadModal(false);
         } catch (error) {
             toast.error('Error al cargar');
         }
     };
 
     const handleClear = async () => {
-        if (!window.confirm('¿Estás seguro de borrar todo el conocimiento?')) return;
         try {
             await knowledgeService.clear();
             toast.success('Base de conocimientos limpiada');
             loadData();
+            setShowClearModal(false);
         } catch (error) {
             toast.error('Error al limpiar');
         }
@@ -113,13 +128,74 @@ const KnowledgePanel = () => {
     return (
         <div className="knowledge-panel">
             <div className="knowledge-controls">
-                <Button onClick={handleSave} variant="secondary"><FaDownload /> Guardar y Descargar</Button>
-                <Button onClick={handleLoad} variant="secondary"><FaFolderOpen /> Cargar</Button>
-                <Button onClick={handleClear} variant="danger"><FaTrash /> Limpiar</Button>
+                <Button onClick={() => setShowSaveModal(true)} variant="secondary"><FaDownload /> Guardar y Descargar</Button>
+                <Button onClick={() => setShowLoadModal(true)} variant="secondary"><FaFolderOpen /> Cargar</Button>
+                <Button onClick={() => setShowClearModal(true)} variant="danger"><FaTrash /> Limpiar</Button>
                 <Button onClick={loadData} variant="outline" isLoading={loading}><FaSync /> Actualizar</Button>
                 <Button onClick={() => setShowInfo(true)} variant="primary"><FaInfoCircle /> Info</Button>
             </div>
 
+            {/* Save Modal */}
+            {showSaveModal && (
+                <Modal isOpen={true} title="Guardar Conocimiento" onClose={() => setShowSaveModal(false)}>
+                    <div style={{ padding: '1rem' }}>
+                        <p style={{ marginBottom: '1rem' }}>
+                            El conocimiento se guardará en el servidor y se descargará un archivo JSON con todos los datos.
+                        </p>
+                        <Input
+                            label="Nombre del archivo"
+                            value={filename}
+                            onChange={(e) => setFilename(e.target.value)}
+                            placeholder="knowledge_base"
+                        />
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem', justifyContent: 'flex-end' }}>
+                            <Button onClick={() => setShowSaveModal(false)} variant="outline">Cancelar</Button>
+                            <Button onClick={handleSave} variant="secondary"><FaDownload /> Guardar</Button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Load Modal */}
+            {showLoadModal && (
+                <Modal isOpen={true} title="Cargar Conocimiento" onClose={() => setShowLoadModal(false)}>
+                    <div style={{ padding: '1rem' }}>
+                        <p style={{ marginBottom: '1rem' }}>
+                            Cargar conocimiento desde el servidor reemplazará el conocimiento actual.
+                        </p>
+                        <Input
+                            label="Nombre del archivo"
+                            value={filename}
+                            onChange={(e) => setFilename(e.target.value)}
+                            placeholder="knowledge_base"
+                        />
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem', justifyContent: 'flex-end' }}>
+                            <Button onClick={() => setShowLoadModal(false)} variant="outline">Cancelar</Button>
+                            <Button onClick={handleLoad} variant="secondary"><FaFolderOpen /> Cargar</Button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Clear Modal */}
+            {showClearModal && (
+                <Modal isOpen={true} title="Limpiar Conocimiento" onClose={() => setShowClearModal(false)}>
+                    <div style={{ padding: '1rem' }}>
+                        <p style={{ marginBottom: '1rem', color: 'var(--danger, #ef4444)', fontWeight: 'bold' }}>
+                            ⚠️ ¿Estás seguro de borrar todo el conocimiento?
+                        </p>
+                        <p style={{ marginBottom: '1.5rem' }}>
+                            Esta acción eliminará todas las Q-tables y abstracciones aprendidas. No se puede deshacer.
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                            <Button onClick={() => setShowClearModal(false)} variant="outline">Cancelar</Button>
+                            <Button onClick={handleClear} variant="danger"><FaTrash /> Confirmar Limpieza</Button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            {/* Info Modal */}
             {showInfo && (
                 <Modal isOpen={true} title="Representación del Conocimiento" onClose={() => setShowInfo(false)}>
                     <div className="knowledge-info">
