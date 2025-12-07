@@ -4,13 +4,19 @@ import Card from '../../components/common/Card';
 import { useTrainingStore } from '../../hooks/useTrainingStore';
 
 const TrainingStats = () => {
-    const { statistics, fetchStatistics, isTraining } = useTrainingStore();
+    const { statistics, status, fetchStatistics, isTraining } = useTrainingStore();
 
     useEffect(() => {
-        if (!isTraining) {
+        // Fetch statistics when training completes or when component mounts
+        if (!isTraining || status?.status === 'completed') {
             fetchStatistics();
         }
-    }, [isTraining, fetchStatistics]);
+    }, [isTraining, status?.status, fetchStatistics]);
+
+    // Also fetch on mount
+    useEffect(() => {
+        fetchStatistics();
+    }, []);
 
     if (!statistics) return null;
 
