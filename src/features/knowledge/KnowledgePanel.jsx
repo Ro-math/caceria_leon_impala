@@ -4,7 +4,8 @@ import AbstractionViewer from './AbstractionViewer';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import { knowledgeService } from '../../services/knowledgeService';
-import { FaSave, FaFolderOpen, FaTrash, FaSync } from 'react-icons/fa';
+import { FaSave, FaFolderOpen, FaTrash, FaSync, FaInfoCircle } from 'react-icons/fa';
+import Modal from '../../components/common/Modal';
 import toast from 'react-hot-toast';
 import './Knowledge.css';
 
@@ -13,13 +14,22 @@ const KnowledgePanel = () => {
     const [data, setData] = useState([]);
     const [abstractions, setAbstractions] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
 
     const loadData = async () => {
         setLoading(true);
         try {
             if (activeTab === 'base') {
                 const result = await knowledgeService.getBase();
-                setData(result.knowledge || []); // Adjust based on actual API response structure
+                // Parse Q-table: { state: { action: value } } -> [{ state, action, value }]
+                const qTable = result.q_table || {};
+                const parsedData = [];
+                Object.entries(qTable).forEach(([state, actions]) => {
+                    Object.entries(actions).forEach(([action, value]) => {
+                        parsedData.push({ state, action, value });
+                    });
+                });
+                setData(parsedData);
             } else {
                 const result = await knowledgeService.getAbstractions();
                 // API returns array directly or object with abstractions property
@@ -77,7 +87,43 @@ const KnowledgePanel = () => {
                 <Button onClick={handleLoad} variant="secondary"><FaFolderOpen /> Cargar</Button>
                 <Button onClick={handleClear} variant="danger"><FaTrash /> Limpiar</Button>
                 <Button onClick={loadData} variant="outline" isLoading={loading}><FaSync /> Actualizar</Button>
+                <Button onClick={() => setShowInfo(true)} variant="primary"><FaInfoCircle /> Info</Button>
             </div>
+
+            {showInfo && (
+                <Modal isOpen={true} title="Representación del Conocimiento" onClose={() => setShowInfo(false)}>
+                    <div className="knowledge-info">
+                        <h3>El Problema: Cacería en la Sabana</h3>
+                        <p>
+                            El objetivo es que el <strong>León</strong> aprenda a capturar al <strong>Impala</strong> en una cuadrícula de 19x19.
+                            El león debe aprender estrategias eficientes (acercarse, emboscar) basándose en la posición del impala.
+                        </p>
+
+                        <h3>Representación del Conocimiento (Q-Learning)</h3>
+                        <p>
+                            El cerebro del león utiliza <strong>Aprendizaje por Refuerzo (Q-Learning)</strong>.
+                            En lugar de reglas fijas ("si ves al impala, corre"), el león aprende el <strong>valor</strong> de cada acción.
+                        </p>
+
+                        <h4>1. Tablas Q (Q-Tables)</h4>
+                        <p>
+                            Es una tabla gigante que mapea <strong>Estados</strong> a <strong>Valores Q</strong>.
+                        </p>
+                        <ul>
+                            <li><strong>Estado:</strong> La situación actual (ej. "Impala está al frente-izquierda, cerca").</li>
+                            <li><strong>Acción:</strong> Lo que el león puede hacer (Avanzar, Rotar Izquierda, Rotar Derecha).</li>
+                            <li><strong>Valor Q:</strong> Un número que indica qué tan buena es esa acción. Un valor alto (verde) significa que esa acción ha llevado al éxito en el pasado. Un valor bajo (rojo) significa que llevó al fracaso o pérdida de tiempo.</li>
+                        </ul>
+
+                        <h4>2. Abstracciones (Generalización)</h4>
+                        <p>
+                            Para no tener que aprender cada posición exacta (lo cual tomaría una eternidad), el león <strong>generaliza</strong>.
+                            Agrupa situaciones similares. Por ejemplo, si el impala está en (5,5) o en (6,6), para el león puede ser simplemente "Impala al Noreste".
+                            Esto le permite aprender mucho más rápido.
+                        </p>
+                    </div>
+                </Modal>
+            )}
 
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                 <Button

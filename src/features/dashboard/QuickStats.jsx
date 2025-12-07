@@ -10,6 +10,7 @@ const QuickStats = () => {
     const [stats, setStats] = React.useState({
         totalIncursions: 0,
         successRate: 0,
+        avgSteps: 0,
         rulesLearned: 0,
         abstractions: 0
     });
@@ -26,7 +27,8 @@ const QuickStats = () => {
                 setStats({
                     totalIncursions: trainingStats.total_incursions || 0,
                     successRate: trainingStats.success_rate ? (trainingStats.success_rate * 100).toFixed(1) : 0,
-                    rulesLearned: baseKnowledge.knowledge ? baseKnowledge.knowledge.length : 0,
+                    avgSteps: trainingStats.avg_steps ? trainingStats.avg_steps.toFixed(1) : 0,
+                    rulesLearned: baseKnowledge.q_table_size || 0,
                     abstractions: Array.isArray(abstractions) ? abstractions.length : (abstractions.abstractions?.length || 0)
                 });
             } catch (error) {
@@ -51,9 +53,14 @@ const QuickStats = () => {
                     <div className="stat-label">Tasa de Éxito</div>
                 </div>
                 <div className="stat-card">
+                    <FaHistory className="stat-icon" style={{ color: 'var(--color-primary)' }} />
+                    <div className="stat-value">{stats.avgSteps}</div>
+                    <div className="stat-label">Pasos Prom.</div>
+                </div>
+                <div className="stat-card">
                     <FaBrain className="stat-icon" style={{ color: 'var(--color-warning)' }} />
                     <div className="stat-value">{stats.rulesLearned}</div>
-                    <div className="stat-label">Reglas</div>
+                    <div className="stat-label">Reglas (Q-Table)</div>
                 </div>
                 <div className="stat-card">
                     <FaSkull className="stat-icon" style={{ color: 'var(--text-muted)' }} />

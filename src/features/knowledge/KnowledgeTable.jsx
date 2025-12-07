@@ -12,23 +12,22 @@ const KnowledgeTable = ({ data }) => {
             <table className="knowledge-table">
                 <thead>
                     <tr>
-                        <th>Posición León</th>
-                        <th>Acción Impala</th>
-                        <th>Acción León</th>
-                        <th>Recompensa</th>
-                        <th>Veces Visto</th>
+                        <th>Estado (Situación)</th>
+                        <th>Acción</th>
+                        <th>Valor Q (Utilidad)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {data.map((row, index) => (
                         <tr key={index}>
-                            <td>{row.lion_position}</td>
-                            <td>{row.impala_action}</td>
-                            <td>{row.lion_action}</td>
-                            <td style={{ color: row.reward > 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
-                                {row.reward}
+                            <td className="state-cell" title={row.state}>{row.state}</td>
+                            <td>{row.action}</td>
+                            <td style={{
+                                color: row.value > 0 ? 'var(--color-success)' : row.value < 0 ? 'var(--color-danger)' : 'inherit',
+                                fontWeight: 'bold'
+                            }}>
+                                {typeof row.value === 'number' ? row.value.toFixed(4) : row.value}
                             </td>
-                            <td>{row.count}</td>
                         </tr>
                     ))}
                 </tbody>
