@@ -4,6 +4,7 @@ import StepControls from './StepControls';
 import ActionDisplay from './ActionDisplay';
 import ExplanationPanel from './ExplanationPanel';
 import TimelineView from './TimelineView';
+import HuntingStats from './HuntingStats';
 import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
 import Select from '../../components/common/Select';
@@ -108,6 +109,7 @@ const HuntingPanel = () => {
                     <>
                         <ExplanationPanel timeStep={huntState.time_step} />
                         <TimelineView history={huntHistory} />
+                        <HuntingStats history={huntHistory} />
                     </>
                 )}
             </div>
