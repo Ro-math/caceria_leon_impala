@@ -4,7 +4,7 @@ import AbstractionViewer from './AbstractionViewer';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import { knowledgeService } from '../../services/knowledgeService';
-import { FaSave, FaFolderOpen, FaTrash, FaSync, FaInfoCircle } from 'react-icons/fa';
+import { FaSave, FaFolderOpen, FaTrash, FaSync, FaInfoCircle, FaDownload } from 'react-icons/fa';
 import Modal from '../../components/common/Modal';
 import toast from 'react-hot-toast';
 import './Knowledge.css';
@@ -50,9 +50,39 @@ const KnowledgePanel = () => {
         const filename = prompt('Nombre del archivo:', 'knowledge_base');
         if (!filename) return;
         try {
+            // Save to server
             await knowledgeService.save(filename);
-            toast.success('Conocimiento guardado');
+
+            // Fetch all knowledge data
+            const baseData = await knowledgeService.getBase();
+            const abstractionsData = await knowledgeService.getAbstractions();
+
+            // Prepare download data
+            const knowledgeExport = {
+                timestamp: new Date().toISOString(),
+                filename: filename,
+                q_table: baseData.q_table || {},
+                abstractions: Array.isArray(abstractionsData) ? abstractionsData : (abstractionsData.abstractions || []),
+                metadata: {
+                    total_states: Object.keys(baseData.q_table || {}).length,
+                    total_abstractions: Array.isArray(abstractionsData) ? abstractionsData.length : (abstractionsData.abstractions || []).length
+                }
+            };
+
+            // Create and download file
+            const blob = new Blob([JSON.stringify(knowledgeExport, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${filename}_export.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            toast.success(`Conocimiento guardado y descargado como ${filename}_export.json`);
         } catch (error) {
+            console.error('Error al guardar:', error);
             toast.error('Error al guardar');
         }
     };
@@ -83,7 +113,7 @@ const KnowledgePanel = () => {
     return (
         <div className="knowledge-panel">
             <div className="knowledge-controls">
-                <Button onClick={handleSave} variant="secondary"><FaSave /> Guardar</Button>
+                <Button onClick={handleSave} variant="secondary"><FaDownload /> Guardar y Descargar</Button>
                 <Button onClick={handleLoad} variant="secondary"><FaFolderOpen /> Cargar</Button>
                 <Button onClick={handleClear} variant="danger"><FaTrash /> Limpiar</Button>
                 <Button onClick={loadData} variant="outline" isLoading={loading}><FaSync /> Actualizar</Button>
