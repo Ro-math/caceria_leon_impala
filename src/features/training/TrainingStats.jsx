@@ -1,17 +1,29 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import Card from '../../components/common/Card';
 import { useTrainingStore } from '../../hooks/useTrainingStore';
 
 const TrainingStats = () => {
     const { statistics, status, fetchStatistics, isTraining } = useTrainingStore();
+    const prevStatusRef = useRef();
 
     useEffect(() => {
-        // Fetch statistics when training completes or when component mounts
-        if (!isTraining || status?.status === 'completed') {
+        // Detect when training just completed
+        if (prevStatusRef.current?.status !== 'completed' && status?.status === 'completed') {
+            // Wait 2 seconds for backend to finish calculating statistics
+            setTimeout(() => {
+                fetchStatistics();
+            }, 2000);
+        }
+        prevStatusRef.current = status;
+    }, [status, fetchStatistics]);
+
+    useEffect(() => {
+        // Fetch statistics when training completes or when not training
+        if (!isTraining) {
             fetchStatistics();
         }
-    }, [isTraining, status?.status, fetchStatistics]);
+    }, [isTraining, fetchStatistics]);
 
     // Also fetch on mount
     useEffect(() => {
