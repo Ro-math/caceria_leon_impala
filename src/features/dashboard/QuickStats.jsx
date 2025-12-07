@@ -3,14 +3,39 @@ import Card from '../../components/common/Card';
 import { FaTrophy, FaSkull, FaBrain, FaHistory } from 'react-icons/fa';
 import './Dashboard.css';
 
+import { trainingService } from '../../services/trainingService';
+import { knowledgeService } from '../../services/knowledgeService';
+
 const QuickStats = () => {
-    // Mock data or fetch from store
-    const stats = {
-        totalIncursions: 1250,
-        successRate: 78.5,
-        rulesLearned: 342,
-        abstractions: 15
-    };
+    const [stats, setStats] = React.useState({
+        totalIncursions: 0,
+        successRate: 0,
+        rulesLearned: 0,
+        abstractions: 0
+    });
+
+    React.useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const [trainingStats, baseKnowledge, abstractions] = await Promise.all([
+                    trainingService.getStatistics(),
+                    knowledgeService.getBase(),
+                    knowledgeService.getAbstractions()
+                ]);
+
+                setStats({
+                    totalIncursions: trainingStats.total_incursions || 0,
+                    successRate: trainingStats.success_rate ? (trainingStats.success_rate * 100).toFixed(1) : 0,
+                    rulesLearned: baseKnowledge.knowledge ? baseKnowledge.knowledge.length : 0,
+                    abstractions: Array.isArray(abstractions) ? abstractions.length : (abstractions.abstractions?.length || 0)
+                });
+            } catch (error) {
+                console.error("Error fetching quick stats:", error);
+            }
+        };
+
+        fetchStats();
+    }, []);
 
     return (
         <Card title="Estadísticas Rápidas">

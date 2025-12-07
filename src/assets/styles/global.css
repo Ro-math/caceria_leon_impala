@@ -1,32 +1,49 @@
 :root {
-  /* Color Palette */
-  --color-primary: #ffb703; /* Lion Gold */
-  --color-primary-hover: #fb8500;
-  --color-secondary: #8ecae6; /* Water/Sky */
-  --color-accent: #219ebc;
-  --color-danger: #d90429;
+  /* Color Palette - Savanna Theme */
+  --color-primary: #fcbf49;
+  /* Golden Sun */
+  --color-primary-hover: #f77f00;
+  /* Orange Sunset */
+  --color-secondary: #606c38;
+  /* Olive Green */
+  --color-accent: #bc6c25;
+  /* Tiger's Eye Brown */
+  --color-danger: #d62828;
+  /* Red Earth */
   --color-success: #2a9d8f;
+  /* Jungle Green */
   --color-warning: #e9c46a;
-  
+  /* Sand */
+
   /* Backgrounds */
-  --bg-main: #023047; /* Deep Blue/Dark */
-  --bg-panel: #1d3557;
-  --bg-card: #457b9d;
-  --bg-input: #f1faee;
+  --bg-main: #1f2421;
+  /* Dark Jungle */
+  --bg-panel: #2b2f2b;
+  /* Darker Olive-Grey */
+  --bg-card: #363b36;
+  /* Deep Mossy Grey */
+  --bg-input: #fefae0;
+  /* Cornsilk */
 
   /* Text */
-  --text-main: #f1faee;
-  --text-muted: #a8dadc;
-  --text-dark: #1d3557;
+  --text-main: #fefae0;
+  /* Cornsilk */
+  --text-muted: #dda15e;
+  /* Earthy Beige */
+  --text-dark: #283618;
+  /* Dark Moss */
 
   /* Grid */
-  --grid-line: rgba(255, 255, 255, 0.1);
-  --grid-bg: #001d3d;
+  --grid-line: rgba(254, 250, 224, 0.1);
+  --grid-bg: #1a1d1a;
 
   /* Vision Cones */
-  --vision-front: rgba(255, 255, 0, 0.2);
-  --vision-left: rgba(255, 0, 0, 0.2);
-  --vision-right: rgba(0, 0, 255, 0.2);
+  --vision-front: rgba(252, 191, 73, 0.3);
+  /* Gold */
+  --vision-left: rgba(214, 40, 40, 0.3);
+  /* Red */
+  --vision-right: rgba(42, 157, 143, 0.3);
+  /* Teal */
 
   /* Spacing */
   --spacing-xs: 0.25rem;
