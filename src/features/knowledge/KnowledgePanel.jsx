@@ -22,7 +22,8 @@ const KnowledgePanel = () => {
                 setData(result.knowledge || []); // Adjust based on actual API response structure
             } else {
                 const result = await knowledgeService.getAbstractions();
-                setAbstractions(result.abstractions || []);
+                // API returns array directly or object with abstractions property
+                setAbstractions(Array.isArray(result) ? result : (result.abstractions || []));
             }
         } catch (error) {
             toast.error('Error al cargar conocimiento');

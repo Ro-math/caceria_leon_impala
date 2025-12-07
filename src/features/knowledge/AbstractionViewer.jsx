@@ -7,14 +7,17 @@ const AbstractionViewer = ({ abstractions }) => {
     }
 
     return (
-        <div>
+        <div className="abstraction-list">
             {abstractions.map((abs, index) => (
                 <div key={index} className="abstraction-card">
                     <div className="abstraction-title">Abstracción #{index + 1}</div>
-                    <div className="abstraction-rule">{abs.rule}</div>
-                    <div style={{ fontSize: '0.8rem', marginTop: '0.5rem', color: 'var(--text-muted)' }}>
-                        Basado en {abs.support_count} casos
-                    </div>
+                    {/* API returns strings directly, not objects with rule/support_count */}
+                    <div className="abstraction-rule">{typeof abs === 'string' ? abs : abs.rule}</div>
+                    {typeof abs !== 'string' && abs.support_count && (
+                        <div style={{ fontSize: '0.8rem', marginTop: '0.5rem', color: 'var(--text-muted)' }}>
+                            Basado en {abs.support_count} casos
+                        </div>
+                    )}
                 </div>
             ))}
         </div>

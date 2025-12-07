@@ -4,7 +4,7 @@ import VisionOverlay from './VisionOverlay';
 import { GiLion, GiDeer } from 'react-icons/gi';
 import './Visualization.css';
 
-const GameMap = ({ lionPosition, impalaAction, activeVision }) => {
+const GameMap = ({ lionPosition, impalaPosition, impalaAction, activeVision }) => {
     // Map Size
     const rows = 19;
     const cols = 19;
@@ -32,7 +32,7 @@ const GameMap = ({ lionPosition, impalaAction, activeVision }) => {
         8: { x: 0, y: 0 },   // (0,0) -> Row 0, Col 0
     };
 
-    console.log('[GameMap] Rendering map. LionPos:', lionPosition, 'ImpalaAction:', impalaAction, 'ActiveVision:', activeVision);
+    console.log('[GameMap] Rendering map. LionPos:', lionPosition, 'ImpalaPos:', impalaPosition, 'ImpalaAction:', impalaAction, 'ActiveVision:', activeVision);
 
     const getPositionLabel = (x, y) => {
         for (const [key, pos] of Object.entries(positions)) {
@@ -41,8 +41,8 @@ const GameMap = ({ lionPosition, impalaAction, activeVision }) => {
         return null;
     };
 
-    // Impala Position (9,9) -> Row 9, Col 9
-    const impalaPos = { x: 9, y: 9 };
+    // Impala Position (Default to 9,9 if not provided, e.g. initial load)
+    const currentImpalaPos = impalaPosition || { x: 9, y: 9 };
 
     // Render Grid Background
     const grid = [];
@@ -73,9 +73,7 @@ const GameMap = ({ lionPosition, impalaAction, activeVision }) => {
         } else {
             // If it's an object, assume it matches our internal structure {x: Col, y: Row} 
             // OR check if it has row/col props. 
-            // For safety, let's assume the passed prop `lionPosition` might be [Row, Col] from API.
-            // But if it comes from `positions` object above, it is {x, y}.
-            if ('x' in pos) {
+            if (typeof pos === 'object' && 'x' in pos) {
                 c = pos.x;
                 r = pos.y;
             } else {
@@ -104,7 +102,7 @@ const GameMap = ({ lionPosition, impalaAction, activeVision }) => {
                 {grid}
 
                 {/* Absolute Entities */}
-                <div className="entity impala" style={getStyle(impalaPos)}>
+                <div className="entity impala" style={getStyle(currentImpalaPos)}>
                     <GiDeer />
                 </div>
 
