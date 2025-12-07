@@ -14,7 +14,7 @@ const KnowledgeTable = ({ data }) => {
                     <tr>
                         <th>Estado (Situación)</th>
                         <th>Acción</th>
-                        <th>Valor Q (Utilidad)</th>
+                        <th>Valor Q (Utilidad) % (-1,1) </th>
                     </tr>
                 </thead>
                 <tbody>
