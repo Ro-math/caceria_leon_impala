@@ -8,26 +8,46 @@ import './Training.css';
 const TrainingProgress = () => {
     const { status, isTraining, isPaused, fetchStatus, pauseTraining, resumeTraining, stopTraining, fetchStatistics } = useTrainingStore();
     const prevStatusRef = useRef();
+    const hasCalledStatsRef = useRef(false);
 
+    // Polling for status
     useEffect(() => {
         let interval;
-        if (isTraining || isPaused) {
+        const currentStatus = status?.status;
+
+        // Only poll if training is running or paused, NOT if stopped or completed
+        if ((isTraining || isPaused) && currentStatus !== 'stopped' && currentStatus !== 'completed') {
             interval = setInterval(() => {
                 fetchStatus();
             }, 1000);
         }
+
         return () => clearInterval(interval);
-    }, [isTraining, isPaused, fetchStatus]);
+    }, [isTraining, isPaused, status?.status, fetchStatus]);
 
     // Fetch statistics when training completes
     useEffect(() => {
         const currentStatus = status?.status;
         const prevStatus = prevStatusRef.current;
 
-        // When status changes to 'stopped' or 'completed', fetch statistics
-        if ((currentStatus === 'stopped' || currentStatus === 'completed') && prevStatus !== currentStatus) {
-            console.log('[TrainingProgress] Training finished with status:', currentStatus, '- Fetching statistics...');
-            fetchStatistics();
+        // When status changes to 'stopped' or 'completed', fetch statistics after a delay
+        if ((currentStatus === 'stopped' || currentStatus === 'completed') &&
+            prevStatus !== currentStatus &&
+            !hasCalledStatsRef.current) {
+
+            console.log('[TrainingProgress] Training finished with status:', currentStatus);
+            hasCalledStatsRef.current = true;
+
+            // Wait 1.5 seconds for backend to finish calculating statistics
+            setTimeout(() => {
+                console.log('[TrainingProgress] Fetching statistics now...');
+                fetchStatistics();
+            }, 1500);
+        }
+
+        // Reset the flag when training starts again
+        if (currentStatus === 'running' && prevStatus !== 'running') {
+            hasCalledStatsRef.current = false;
         }
 
         prevStatusRef.current = currentStatus;
@@ -36,15 +56,15 @@ const TrainingProgress = () => {
     if (!status && !isTraining && !isPaused) return null;
 
     const progress = status ? (status.current_incursion / status.total_incursions) * 100 : 0;
-    const isCompleted = status?.status === 'completed';
+    const isCompleted = status?.status === 'completed' || status?.status === 'stopped';
 
     // Determine status badge
     const getStatusBadge = () => {
-        if (isTraining) {
+        if (isTraining && status?.status === 'running') {
             return <span className="status-badge running">🟢 En Ejecución</span>;
         } else if (isPaused) {
             return <span className="status-badge paused">🟡 Pausado</span>;
-        } else if (isCompleted) {
+        } else if (status?.status === 'completed') {
             return <span className="status-badge completed">✅ Completado</span>;
         } else if (status?.status === 'stopped') {
             return <span className="status-badge stopped">🔴 Detenido</span>;
@@ -57,25 +77,23 @@ const TrainingProgress = () => {
             <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 {getStatusBadge()}
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    {isTraining && (
+                    {isTraining && !isCompleted && (
                         <Button
                             onClick={pauseTraining}
                             variant="secondary"
                             className="btn-sm"
-                            disabled={isCompleted}
-                            title={isCompleted ? "El entrenamiento ya finalizó (el proceso es muy rápido)" : "Pausar entrenamiento (La ejecución es muy rápida, puede ser difícil pausar)"}
+                            title="Pausar entrenamiento (La ejecución es muy rápida, puede ser difícil pausar)"
                         >
                             <FaPause /> Pausar
                         </Button>
                     )}
-                    {isPaused && (
+                    {isPaused && !isCompleted && (
                         <>
                             <Button
                                 onClick={resumeTraining}
                                 variant="primary"
                                 className="btn-sm"
-                                disabled={isCompleted}
-                                title={isCompleted ? "El entrenamiento ya finalizó (el proceso es muy rápido)" : "Reanudar entrenamiento desde donde se pausó"}
+                                title="Reanudar entrenamiento desde donde se pausó"
                             >
                                 <FaPlay /> Reanudar
                             </Button>
@@ -83,8 +101,7 @@ const TrainingProgress = () => {
                                 onClick={stopTraining}
                                 variant="danger"
                                 className="btn-sm"
-                                disabled={isCompleted}
-                                title={isCompleted ? "El entrenamiento ya finalizó (el proceso es muy rápido)" : "Detener completamente el entrenamiento"}
+                                title="Detener completamente el entrenamiento"
                             >
                                 <FaStop /> Detener
                             </Button>
