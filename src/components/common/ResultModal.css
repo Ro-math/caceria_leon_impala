@@ -1,0 +1,157 @@
+.result-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.result-modal-content {
+    background-color: var(--bg-panel);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--grid-line);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.result-modal-content.success {
+    border-color: var(--color-success);
+}
+
+.result-modal-content.failed {
+    border-color: var(--color-danger);
+}
+
+.animation-container {
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+}
+
+.result-icon {
+    font-size: 4rem;
+    position: absolute;
+}
+
+/* Success Animations */
+.lion-success {
+    color: var(--color-primary);
+    animation: roar 1s infinite alternate;
+    z-index: 2;
+}
+
+.impala-caught {
+    color: var(--text-muted);
+    font-size: 2rem;
+    transform: translate(20px, 20px) rotate(90deg);
+    opacity: 0.6;
+}
+
+/* Failure Animations */
+.impala-escape {
+    color: var(--color-success);
+    animation: runAway 1.5s infinite linear;
+}
+
+.lion-failed {
+    color: var(--text-muted);
+    font-size: 3rem;
+    animation: confused 2s infinite ease-in-out;
+    opacity: 0.7;
+}
+
+.result-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: var(--spacing-sm);
+}
+
+.result-message {
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes roar {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.2);
+    }
+}
+
+@keyframes runAway {
+    0% {
+        transform: translateX(-50px) scaleX(1);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(50px) scaleX(1);
+        opacity: 0;
+    }
+}
+
+@keyframes confused {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(-10deg);
+    }
+
+    75% {
+        transform: rotate(10deg);
+    }
+}

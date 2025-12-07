@@ -9,6 +9,7 @@ export const useGameStore = create((set, get) => ({
     error: null,
     huntState: null,
     huntHistory: [],
+    currentStepIndex: 0,
 
     // Actions
     initializeSimulation: async (config) => {
@@ -37,7 +38,7 @@ export const useGameStore = create((set, get) => ({
             await huntingService.start(config);
             // Fetch the initial state explicitly because start() only returns a message
             const state = await huntingService.getState();
-            set({ huntState: state, huntHistory: [state], isLoading: false });
+            set({ huntState: state, huntHistory: [state], currentStepIndex: 0, isLoading: false });
         } catch (error) {
             set({ error: error.message, isLoading: false });
         }
@@ -45,15 +46,46 @@ export const useGameStore = create((set, get) => ({
 
     stepHunting: async () => {
         try {
+            // If we are viewing history and not at the end, just move forward in history
+            const { huntHistory, currentStepIndex } = get();
+            if (currentStepIndex < huntHistory.length - 1) {
+                const newIndex = currentStepIndex + 1;
+                set({
+                    currentStepIndex: newIndex,
+                    huntState: huntHistory[newIndex]
+                });
+                return;
+            }
+
+            // Otherwise, perform actual API step
             const result = await huntingService.step();
             // result contains the new state fields directly (lion, impala, etc.)
-            set((state) => ({
-                huntState: result,
-                huntHistory: [...state.huntHistory, result],
-            }));
+            set((state) => {
+                const newHistory = [...state.huntHistory, result];
+                return {
+                    huntState: result,
+                    huntHistory: newHistory,
+                    currentStepIndex: newHistory.length - 1
+                };
+            });
             return result;
         } catch (error) {
             set({ error: error.message });
         }
+    },
+
+    prevStep: () => {
+        const { huntHistory, currentStepIndex } = get();
+        if (currentStepIndex > 0) {
+            const newIndex = currentStepIndex - 1;
+            set({
+                currentStepIndex: newIndex,
+                huntState: huntHistory[newIndex]
+            });
+        }
+    },
+
+    resetHunt: () => {
+        set({ huntState: null, huntHistory: [], currentStepIndex: 0, error: null });
     },
 }));

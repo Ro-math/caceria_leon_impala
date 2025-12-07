@@ -10,11 +10,10 @@ const MainLayout = ({ children, title = 'Dashboard' }) => {
         <div className="main-layout">
             <Sidebar />
             <div className="main-content-wrapper">
-                <Header title={title} />
                 <main className="content-area">
                     {children}
                 </main>
-                <Footer />
+               
             </div>
             <Toaster
                 position="top-right"
